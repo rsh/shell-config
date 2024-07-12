@@ -30,7 +30,7 @@ sudo apt install python3-pip
 sudo apt install pipx
 
 sudo apt install git
-sudo apt-get install gnome-tweaks
+sudo apt install gnome-tweaks
 sudo apt install neovim
 sudo apt install tmux
 sudo apt install zsh
