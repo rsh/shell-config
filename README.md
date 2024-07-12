@@ -1,6 +1,6 @@
 # RSH Shell Config
 
-This repo contains the configuration I usually set up on a new Linux-based machine.
+This repo contains the configuration I usually set up on a new machine.
 
 
 # Copy dotfiles
