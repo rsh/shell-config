@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+rsync ~/notes rsync-net: -avz -h --progress
+echo "--------------------------------"
+rsync ~/rsync.net/local/files rsync-net: -avz -h --progress

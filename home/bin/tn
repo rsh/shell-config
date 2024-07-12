@@ -1,0 +1,25 @@
+#!/bin/bash
+
+session="notes"
+tmux has-session -t $session 2>/dev/null
+
+if [ $? != 0 ]; then
+  tmux new-session -d -s $session
+
+  window=1
+  tmux rename-window -t $session:$window 'todo'
+  # C-m makes it execute immediately, rather than typing it out and waiting for the user to hit enter
+  tmux send-keys -t $session:$window 'vim ~/notes/todo.md' C-m
+
+  window=2
+  tmux new-window -t $session:$window -n 'journal'
+  tmux send-keys -t $session:$window 'cd ~/notes/personal' C-m
+
+  window=3
+  tmux new-window -t $session:$window -n 'reading'
+  tmux send-keys -t $session:$window 'epy' C-m
+
+  tmux select-window -t $session:1
+fi
+
+tmux attach-session -t $session

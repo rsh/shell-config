@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+# C-m makes it execute immediately, rather than typing it out and waiting for the user to hit enter
+
+session="notes"
+
+tmux new-session -d -s $session
+
+window=0
+tmux rename-window -t $session:$window 'todo'
+tmux send-keys -t $session:$window 'vim ~/notes/todo.md' C-m
+
+window=1
+tmux new-window -t $session:$window -n 'journal'
+tmux send-keys -t $session:$window 'cd ~/notes/personal' C-m
+
+tmux select-window -t $session:0
+
+tmux attach-session -t $session
+

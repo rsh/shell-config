@@ -1,0 +1,41 @@
+#!/usr/bin/python3
+
+import os
+import pathlib
+
+cwd = os.getcwd()
+file_paths = [x for x in pathlib.Path(cwd).iterdir() if x.is_file() and os.path.basename(x).endswith(".md")]
+
+file_paths = sorted(file_paths, key=os.path.getmtime)
+
+def passes_linting(line):
+    return date_and_weekday_match(line)
+
+def date_and_weekday_match(line):
+    # Checks if date like "Monday, 2024-01-30" is valid.
+    # Do the weekday and date match? Return the answer to this question. 
+    return line.find("Monday") # Pick up work here
+
+ran_clean = True # capture the behavior of "Starts true, can only be set to False over and over, attempt to set to True causes exception" library. Call it "OneWayBoolean(bool)"
+
+for file_path in file_paths:
+
+    with open(file_path) as fp:
+        basename = os.path.basename(file_path)
+        print()
+        print(basename)
+        print("=" * len(basename))
+
+        for line in fp:
+            if(passes_linting(line)):
+                print(f"DEBUG: Line Clean   | {line.strip()}")
+            else:
+                ran_clean = False
+                print(f"ERROR: Failed Lint  | {line.strip()}")
+
+if(ran_clean):
+    print("Linting success")
+    exit(0)
+else:
+    print("!!!!! LINTING ERROR !!!!!!!")
+    exit(1)

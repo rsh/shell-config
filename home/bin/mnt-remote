@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sshfs rsync-net: ~/rsync.net/remote

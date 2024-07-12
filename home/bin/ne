@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+
+import datetime
+import os
+import re
+import sys
+
+
+def append_date_and_start_vim(filename, prepend_newlines=False):
+    prepend_str = "\n\n" if prepend_newlines else ""
+
+    date_and_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+
+    os.system(f'echo  "{prepend_str}## {date_and_time_str}\n\n" >> {filename}')
+    os.system(f'vim +$ +startinsert {filename}')
+
+note_name_input = 'scratchpad'
+if(len(sys.argv) > 1):
+    note_name_input = sys.argv[1]
+
+if note_name_input.endswith(".md"): # it's a filename
+    # TODO: Check if it's a valid file
+
+    # TODO: Be smarter about appending to end of file.
+    # Find the last non-whitespace line, delete everything after, add two newlines, add date.
+
+    filename = note_name_input
+    append_date_and_start_vim(note_name_input, prepend_newlines=True)
+else: # it's a new note
+    date_str = datetime.datetime.now().strftime('%Y-%m-%d')
+    filename = f"{date_str}_{note_name_input}.md"
+    # filename = f"{note_name_input}.md"
+
+    append_date_and_start_vim(filename)

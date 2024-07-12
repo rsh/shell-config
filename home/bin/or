@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+
+import os
+import pathlib
+import sys
+
+cwd = os.getcwd()
+file_paths = [x for x in pathlib.Path(cwd).iterdir() if x.is_file()]
+
+file_paths = sorted(file_paths, key=os.path.getmtime)
+
+for idx, file_path in enumerate(file_paths):
+    print(f"{len(file_paths)-idx}\t{os.path.basename(file_path)}")
+
+print()
+user_selection = input("Which file? (or 'q' to quit): ")
+
+if(user_selection == "q" or user_selection == ""):
+    exit()
+
+os.system(f'vim {file_paths[len(file_paths)-int(user_selection)]}')
+
