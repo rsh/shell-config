@@ -51,7 +51,7 @@ cp -r ./home/. ~
 
 1. Open "Tweaks"
 1. "Keyboard" => "Additional Layout Options"
-1. "Caps Lock Behavior" => "Make Caps Lock and additional Ctrl"
+1. "Caps Lock Behavior" => "Make Caps Lock an additional Ctrl"
 
 ## Per-application settings
 
