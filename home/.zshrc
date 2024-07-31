@@ -108,3 +108,5 @@ alias vi="nvim"
 alias vim="nvim"
 
 source <(fzf --zsh)
+eval "$(direnv hook zsh)"
+
