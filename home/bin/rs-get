@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+mkdir -p ~/rsync.net/local/
+
 rsync rsync-net:notes ~/ -avz -h --progress
 echo "--------------------------------"
 rsync rsync-net:files ~/rsync.net/local/ -avz -h --progress
