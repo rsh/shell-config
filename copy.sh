@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-cp -r ./home/. ~
+cd ./home
+stow -t ~ .
+
