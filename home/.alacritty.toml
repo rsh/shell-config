@@ -22,12 +22,12 @@ style = "Regular"
 padding = { x = 4, y = 4 }
 dynamic_padding = true
 decorations = 'none'
-startup_mode = 'Fullscreen'
+# startup_mode = 'Fullscreen'
 
 [mouse]
-hide_when_typing = true
+# hide_when_typing = true
 
 [general]
 import = [
-    "~/.config/alacritty/themes/gruvbox_material_medium_dark.toml"
+    "~/.config/alacritty/themes/rose-pine-moon.toml"
 ]
