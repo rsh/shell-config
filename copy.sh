@@ -2,4 +2,5 @@
 
 cd ./home
 stow -t ~ .
+sudo stow -t /etc etc
 
