@@ -81,6 +81,15 @@ Gnome/Wayland doesn't allow global shortcuts, so [this workaround](https://1pass
 
 Run `sudo pam-auth-update` and enable the fingerprint reader by hitting spacebar.
 
+## Niri Keybindings
+
+Custom application shortcuts:
+- `Mod+T` - Open Terminal (alacritty)
+- `Mod+D` - Run Application launcher (fuzzel)
+- `Mod+B` - Open Firefox
+- `Mod+N` - Open qutebrowser
+- `Mod+P` - Open 1Password
+
 
 # TODO
 

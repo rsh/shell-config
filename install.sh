@@ -14,6 +14,19 @@ sudo apt install gnome-shell-extensions
 sudo apt install tmux
 sudo apt install zsh
 sudo apt install sshfs
+sudo apt install brightnessctl
+
+# Waybar and fonts
+sudo apt install waybar
+sudo apt install fonts-font-awesome
+
+# Install keyd from PPA
+sudo add-apt-repository ppa:keyd-team/ppa -y
+sudo apt update
+sudo apt install keyd
+sudo usermod -aG video $USER
+sudo usermod -aG input $USER
+sudo systemctl enable --now keyd
 
 pipx install epy-reader
 
@@ -25,3 +38,4 @@ brew install neovim
 chsh -s $(which zsh)
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
+echo "Note: xwayland-satellite needs to be built and placed in /usr/local/bin"
