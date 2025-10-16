@@ -28,50 +28,40 @@
     },
 
     "cpu": {
-        "format": "⚙ {usage}%",
+        "format": "C {usage}%",
         "tooltip": true
     },
 
     "memory": {
-        "format": "▦ {}%"
+        "format": "M {}%"
     },
 
     "temperature": {
         "critical-threshold": 80,
-        "format": "{icon} {temperatureC}°C",
-        "format-icons": ["", "", ""]
+        "format": "T {temperatureC}°C"
     },
 
     "battery": {
-        "interval": 5,
+        "interval": 2,
         "states": {
             "warning": 30,
             "critical": 15
         },
-        "format": "{capacity}%",
-        "format-charging": "⚡ {capacity}%",
-        "format-plugged": "⚡ {capacity}%"
+        "format": "B {capacity}%",
+        "format-charging": "B+ {capacity}%",
+        "format-plugged": "B+ {capacity}%"
     },
 
     "network": {
-        "format-wifi": "WIFI {essid} ({signalStrength}%)",
-        "format-ethernet": "ETH {ifname}",
-        "format-disconnected": "⚠ Disconnected",
+        "format-wifi": "W {essid} ({signalStrength}%)",
+        "format-ethernet": "E {ifname}",
+        "format-disconnected": "X DISCONNECTED",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
     },
 
     "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "🔇",
-        "format-icons": {
-            "headphone": "🔊",
-            "hands-free": "🔊",
-            "headset": "🔊",
-            "phone": "🔊",
-            "portable": "🔊",
-            "car": "🔊",
-            "default": ["🔈", "🔉", "🔊"]
-        },
+        "format": "V {volume}%",
+        "format-muted": "V MUTE",
         "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
     },
 
