@@ -107,6 +107,43 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 alias vi="nvim"
 alias vim="nvim"
 
+# Tmux session creation helper
+tmux() {
+    # Check if creating a new session without a name
+    # Activates when: no arguments, "new", or "new-session" without -s flag
+    if ([[ $# -eq 0 ]] || [[ "$1" == "new" || "$1" == "new-session" ]]) && [[ ! "$*" =~ "-s" ]] && [[ ! "$*" =~ "session-name" ]]; then
+        local folder_name=$(basename "$PWD")
+
+        # Prompt user
+        echo -n "Name this tmux session after the current folder '$folder_name'? [Y/n/custom]: "
+        read response
+
+        case "$response" in
+            [nN]*)
+                # User declined, create session without name
+                command tmux "$@"
+                ;;
+            [cC]*)
+                # User wants custom name
+                echo -n "Enter session name: "
+                read custom_name
+                if [[ -n "$custom_name" ]]; then
+                    command tmux new-session -s "$custom_name" "${@:2}"
+                else
+                    command tmux "$@"
+                fi
+                ;;
+            *)
+                # Default: use folder name (Y or Enter)
+                command tmux new-session -s "$folder_name" "${@:2}"
+                ;;
+        esac
+    else
+        # Not creating a new session, or session name already specified
+        command tmux "$@"
+    fi
+}
+
 source <(fzf --zsh)
 eval "$(direnv hook zsh)"
 

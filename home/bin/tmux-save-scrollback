@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Script to save tmux pane scrollback history to a file
+# Each pane gets a separate file with session/window/pane identification
+
+# Directory to store scrollback files
+SCROLLBACK_DIR="${TMUX_SCROLLBACK_DIR:-$HOME/.tmux-scrollback}"
+mkdir -p "$SCROLLBACK_DIR"
+
+# Get current pane information
+SESSION_NAME=$(tmux display-message -p '#S')
+WINDOW_INDEX=$(tmux display-message -p '#I')
+WINDOW_NAME=$(tmux display-message -p '#W')
+PANE_INDEX=$(tmux display-message -p '#P')
+PANE_ID=$(tmux display-message -p '#{pane_id}')
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Create a unique filename
+# Format: session_window-name_pane_timestamp.log
+FILENAME="${SESSION_NAME}_w${WINDOW_INDEX}-${WINDOW_NAME}_p${PANE_INDEX}_${TIMESTAMP}.log"
+FILEPATH="$SCROLLBACK_DIR/$FILENAME"
+
+# Capture the entire scrollback buffer (-S - means start of history)
+tmux capture-pane -pS - > "$FILEPATH"
+
+# Display confirmation message
+echo "Scrollback saved to: $FILEPATH"
+tmux display-message "Scrollback saved: $FILENAME"

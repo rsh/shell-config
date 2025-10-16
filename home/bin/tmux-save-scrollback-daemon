@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Daemon wrapper for periodic scrollback saving
+# Runs tmux-save-scrollback-periodic every N seconds
+
+# How often to run (in seconds)
+INTERVAL=${TMUX_SCROLLBACK_INTERVAL:-60}
+
+# PID file to track daemon
+PID_FILE="${TMUX_SCROLLBACK_DIR:-$HOME/.tmux-scrollback}/.daemon.pid"
+mkdir -p "$(dirname "$PID_FILE")"
+
+# Function to check if daemon is already running
+is_running() {
+    if [ -f "$PID_FILE" ]; then
+        local pid=$(cat "$PID_FILE")
+        if kill -0 "$pid" 2>/dev/null; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# If already running, exit
+if is_running; then
+    exit 0
+fi
+
+# Write our PID
+echo $$ > "$PID_FILE"
+
+# Cleanup on exit
+trap 'rm -f "$PID_FILE"' EXIT
+
+# Run periodically while tmux is running
+while true; do
+    ~/bin/tmux-save-scrollback-periodic
+    sleep "$INTERVAL"
+
+    # Check if any tmux processes are running (handles multiple servers)
+    if ! pgrep -x tmux >/dev/null 2>&1; then
+        # No tmux processes - save one last time and exit
+        ~/bin/tmux-save-scrollback-periodic
+        exit 0
+    fi
+done
