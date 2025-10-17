@@ -1,21 +1,28 @@
 #!/bin/bash
 
-# Usage: ts <session_name>
+# Usage: ts <session_name> [base_directory]
 # Creates a new niri workspace, opens a tmux session with the given name
-# If session_name matches a directory in ~/dev, uses that as the base directory
+# If base_directory is provided, uses that as the working directory
+# Otherwise, if session_name matches a directory in ~/dev, uses that as the base directory
+# Otherwise defaults to ~
 
 if [ -z "$1" ]; then
-  echo "Usage: ts <session_name>"
+  echo "Usage: ts <session_name> [base_directory]"
   exit 1
 fi
 
 session_name="$1"
 base_dir="$HOME"
 
-# Check if a directory with this name exists in ~/dev
-dev_dir="$HOME/dev/$session_name"
-if [ -d "$dev_dir" ]; then
-  base_dir="$dev_dir"
+# If a base directory was provided, use it
+if [ -n "$2" ]; then
+  base_dir="$2"
+else
+  # Otherwise check if a directory with this name exists in ~/dev
+  dev_dir="$HOME/dev/$session_name"
+  if [ -d "$dev_dir" ]; then
+    base_dir="$dev_dir"
+  fi
 fi
 
 # Get the highest workspace number to ensure we move to the last one first
@@ -34,11 +41,4 @@ niri msg action focus-workspace-down
 sleep 0.2
 
 # Open alacritty with tmux session in the base directory
-# Check if session exists; if not, create it with the base directory
-alacritty -e bash -c "
-  if ! tmux has-session -t \"$session_name\" 2>/dev/null; then
-    exec tmux new-session -s \"$session_name\" -c \"$base_dir\"
-  else
-    exec tmux attach-session -t \"$session_name\"
-  fi
-" &
+alacritty -e bash -c "cd \"$base_dir\" && exec tmux new-session -A -s \"$session_name\"" &
