@@ -275,10 +275,11 @@ layout {
 // See the binds section below for more spawn examples.
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
-spawn-at-startup "waybar"
 
 // swayosd provides on-screen display for volume, brightness, and other indicators
 spawn-at-startup "swayosd-server"
+
+spawn-at-startup "bash" "-c" "/home/rayhan/dev/shell-config/scripts/niri-startup-workspaces.sh"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"

@@ -2,7 +2,7 @@
     border: none;
     border-radius: 0;
     font-family: "Victor Mono";
-    font-size: 13px;
+    font-size: 16px;
     min-height: 0;
 }
 
@@ -38,6 +38,16 @@ window#waybar {
     padding: 0 10px;
     margin: 0;
     background-color: transparent;
+}
+
+#custom-sep1,
+#custom-sep2,
+#custom-sep3,
+#custom-sep4,
+#custom-sep5,
+#custom-sep6 {
+    padding: 0 5px;
+    color: #4a4a4a;
 }
 
 #battery.charging {
