@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# List tmux sessions and let user pick one with fzf
+session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --prompt="Select tmux session: " --height=40% --reverse)
+
+# Exit if no session was selected
+if [ -z "$session" ]; then
+  echo "No session selected"
+  exit 0
+fi
+
+# Attach to the selected session
+# If already inside tmux, switch to the session; otherwise attach
+if [ -n "$TMUX" ]; then
+  tmux switch-client -t "$session"
+else
+  tmux attach-session -t "$session"
+fi
