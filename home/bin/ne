@@ -4,6 +4,8 @@ import datetime
 import os
 import re
 import sys
+import tempfile
+import shutil
 
 
 def append_date_and_start_vim(filename, prepend_newlines=False):
@@ -20,26 +22,37 @@ def append_date_and_start_vim(filename, prepend_newlines=False):
 
     date_and_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
-    # Write the cleaned content + two newlines + date + two newlines
-    with open(filename, 'w') as f:
-        if content:
-            f.write(content)
-        f.write(f"{prepend_str}## {date_and_time_str}\n\n")
+    # Write to a temporary file first, then rename atomically
+    fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(os.path.abspath(filename)) or '.', prefix='.tmp_', suffix='.md')
+    try:
+        with os.fdopen(fd, 'w') as f:
+            if content:
+                f.write(content)
+            f.write(f"{prepend_str}## {date_and_time_str}\n\n\n")
+        shutil.move(temp_path, filename)
+    except:
+        os.unlink(temp_path)
+        raise
 
     os.system(f'nvim +$ +startinsert {filename}')
 
 note_name_input = 'scratchpad'
-if(len(sys.argv) > 1):
+if len(sys.argv) > 1:
     note_name_input = sys.argv[1]
 
-if note_name_input.endswith(".md"): # it's a filename
-    # TODO: Check if it's a valid file
-
+# If filename ends with .md, use it as-is (exact filename)
+if note_name_input.endswith('.md'):
     filename = note_name_input
-    append_date_and_start_vim(note_name_input, prepend_newlines=True)
-else: # it's a new note
+    prepend_newlines = os.path.exists(filename)
+    append_date_and_start_vim(filename, prepend_newlines=prepend_newlines)
+else:
+    # For non-.md inputs, use dated filename
     date_str = datetime.datetime.now().strftime('%Y-%m-%d')
-    filename = f"{date_str}_{note_name_input}.md"
-    # filename = f"{note_name_input}.md"
+    dated_filename = f"{date_str}_{note_name_input}.md"
 
-    append_date_and_start_vim(filename)
+    if os.path.exists(dated_filename): # Check if dated version exists
+        filename = dated_filename
+        append_date_and_start_vim(filename, prepend_newlines=True)
+    else: # it's a new note
+        filename = dated_filename
+        append_date_and_start_vim(filename)
