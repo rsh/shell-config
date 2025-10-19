@@ -1,7 +1,21 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+# Check for --dry-run flag
+DRY_RUN=false
+if [[ "${1:-}" == "--dry-run" ]]; then
+    DRY_RUN=true
+    STOW_FLAGS="-n"
+    echo "=== DRY RUN MODE - No changes will be made ==="
+else
+    STOW_FLAGS=""
+fi
 
 # Stow home directory files
-stow -t ~ home
+if [ "$DRY_RUN" = true ]; then
+    echo "Would stow home directory files..."
+fi
+stow $STOW_FLAGS -t ~ home
 
 # Only stow to /etc if there are differences
 # Check if files in etc/ differ from their symlink targets in /etc
@@ -32,8 +46,13 @@ while IFS= read -r -d '' file; do
 done < <(find etc -type f -print0)
 
 if $needs_update; then
-    echo "Changes detected in /etc, running sudo stow..."
-    sudo stow -t /etc etc
+    if [ "$DRY_RUN" = true ]; then
+        echo "Would run: sudo stow -t /etc etc"
+        sudo stow -n -t /etc etc
+    else
+        echo "Changes detected in /etc, running sudo stow..."
+        sudo stow -t /etc etc
+    fi
 else
     echo "No changes in /etc, skipping sudo stow"
 fi

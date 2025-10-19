@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -euo pipefail
 
 # C-m makes it execute immediately, rather than typing it out and waiting for the user to hit enter
 

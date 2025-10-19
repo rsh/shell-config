@@ -1,9 +1,11 @@
-#!/bin/zsh
+#!/usr/bin/env bash
+set -euo pipefail
 
-# sed 's/^charging /⚡︎/g' | \
+# power_state - Display power adapter connection status
+# Shows ⚡︎ when charging, blank when on battery
+
 if [[ $OSTYPE == 'linux-gnu' ]]; then
-  cat /sys/class/power_supply/ACAD/online | \
-    sed 's/1/⚡︎/g' | sed 's/0/  /g'
+  sed 's/1/⚡︎/g; s/0/  /g' < /sys/class/power_supply/ACAD/online
 elif [[ $OSTYPE == darwin* ]]; then
   echo "<Not yet implemented>"
 fi

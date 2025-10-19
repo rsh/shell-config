@@ -1,4 +1,9 @@
 #!/bin/bash
+set -euo pipefail
+
+# tm - Tmux session manager with fzf
+# Usage: tm
+# Interactively select and attach to an existing tmux session using fzf
 
 # List tmux sessions and let user pick one with fzf
 session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --prompt="Select tmux session: " --height=40% --reverse)

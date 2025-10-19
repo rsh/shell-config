@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Daemon wrapper for periodic scrollback saving
 # Runs tmux-save-scrollback-periodic every N seconds
@@ -13,7 +14,8 @@ mkdir -p "$(dirname "$PID_FILE")"
 # Function to check if daemon is already running
 is_running() {
     if [ -f "$PID_FILE" ]; then
-        local pid=$(cat "$PID_FILE")
+        local pid
+        pid=$(cat "$PID_FILE")
         if kill -0 "$pid" 2>/dev/null; then
             return 0
         fi

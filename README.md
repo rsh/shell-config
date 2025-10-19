@@ -32,7 +32,7 @@ In `about:config`, set `apz.gtk.kinetic_scroll.enabled` to `false`.
 #### Change reader font to EB Garamond
 
 1. Download [EB Garamond](https://fonts.google.com/specimen/EB+Garamond)
-1. `mkir -p /home/rayhan/snap/firefox/common/.fonts`
+1. `mkdir -p /home/rayhan/snap/firefox/common/.fonts`
 1. Copy the TTF files to that directory
 1. `cd ~/snap/firefox/common/.mozilla/firefox/*.default`
 1. `mkdir -p chrome && cd chrome && echo "@-moz-document url-prefix('about:reader') {\n    body.serif {\n        font-family: 'EB Garamond' \!important;\n    }\n}\n" >> userContent.css`

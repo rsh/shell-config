@@ -1,25 +1,32 @@
 #!/bin/bash
+set -euo pipefail
+
+# tn - Tmux notes session
+# Usage: tn
+# Creates or attaches to a 'notes' tmux session with predefined windows:
+#   - Window 1: todo (opens ~/notes/todo.md in nvim)
+#   - Window 2: journal (opens ~/notes/personal directory)
+#   - Window 3: reading (launches epy reader)
 
 session="notes"
-tmux has-session -t $session 2>/dev/null
 
-if [ $? != 0 ]; then
-  tmux new-session -d -s $session
+if ! tmux has-session -t "$session" 2>/dev/null; then
+  tmux new-session -d -s "$session"
 
   window=1
-  tmux rename-window -t $session:$window 'todo'
+  tmux rename-window -t "$session:$window" 'todo'
   # C-m makes it execute immediately, rather than typing it out and waiting for the user to hit enter
-  tmux send-keys -t $session:$window 'nvim ~/notes/todo.md' C-m
+  tmux send-keys -t "$session:$window" 'nvim ~/notes/todo.md' C-m
 
   window=2
-  tmux new-window -t $session:$window -n 'journal'
-  tmux send-keys -t $session:$window 'cd ~/notes/personal' C-m
+  tmux new-window -t "$session:$window" -n 'journal'
+  tmux send-keys -t "$session:$window" 'cd ~/notes/personal' C-m
 
   window=3
-  tmux new-window -t $session:$window -n 'reading'
-  tmux send-keys -t $session:$window 'epy' C-m
+  tmux new-window -t "$session:$window" -n 'reading'
+  tmux send-keys -t "$session:$window" 'epy' C-m
 
-  tmux select-window -t $session:1
+  tmux select-window -t "$session:1"
 fi
 
-tmux attach-session -t $session
+tmux attach-session -t "$session"

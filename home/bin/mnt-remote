@@ -1,3 +1,15 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-sshfs rsync-net: ~/rsync.net/remote
+MOUNT_POINT="$HOME/rsync.net/remote"
+
+# Create mount point if it doesn't exist
+mkdir -p "$MOUNT_POINT"
+
+# Mount the remote filesystem
+if ! sshfs rsync-net: "$MOUNT_POINT"; then
+    echo "Error: Failed to mount rsync-net to $MOUNT_POINT" >&2
+    exit 1
+fi
+
+echo "Successfully mounted rsync-net to $MOUNT_POINT"

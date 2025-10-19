@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Periodically save scrollback for specific applications
 # Reads list of applications from ~/.config/tmux-save-scrollback/commands_to_save.conf
@@ -31,9 +32,12 @@ flock -n 200 || exit 0
 
 # Function to log execution time on exit
 log_execution_time() {
-    local end_time=$(date +%s.%N)
-    local duration=$(echo "$end_time - $SCRIPT_START_TIME" | bc)
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local end_time
+    local duration
+    local timestamp
+    end_time=$(date +%s.%N)
+    duration=$(echo "$end_time - $SCRIPT_START_TIME" | bc)
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] Execution time: ${duration}s" >> "$LOG_FILE"
 }
 
@@ -97,9 +101,10 @@ find_suffix_match() {
     local old_file="$1"
     local new_file="$2"
     local min_match_lines=5  # Minimum lines to consider a good match
-
-    local old_lines=$(wc -l < "$old_file")
-    local new_lines=$(wc -l < "$new_file")
+    local old_lines
+    local new_lines
+    old_lines=$(wc -l < "$old_file")
+    new_lines=$(wc -l < "$new_file")
 
     # Early exit if files are too small
     if [ "$old_lines" -lt "$min_match_lines" ] || [ "$new_lines" -lt "$min_match_lines" ]; then
@@ -127,11 +132,13 @@ find_suffix_match() {
         [ "$suffix_len" -gt "$old_lines" ] && continue
 
         # Get hash of old suffix
-        local old_hash=$(compute_tail_hash "$old_file" "$suffix_len")
+        local old_hash
+        local new_hash
+        old_hash=$(compute_tail_hash "$old_file" "$suffix_len")
 
         # Check if this suffix appears at the end of new content
         if [ "$suffix_len" -le "$new_lines" ]; then
-            local new_hash=$(compute_tail_hash "$new_file" "$suffix_len")
+            new_hash=$(compute_tail_hash "$new_file" "$suffix_len")
 
             if [ "$old_hash" = "$new_hash" ]; then
                 # Found a match! Return the line number where new content starts
@@ -197,7 +204,8 @@ for SERVER in "${SERVERS[@]}"; do
 
             for WINDOW in $WINDOWS; do
                 # Get all panes in this window with their commands and PIDs
-                $TMUX_CMD list-panes -t "${SESSION}:${WINDOW}" -F "#{pane_id}|#{pane_pid}|#{pane_current_command}" 2>/dev/null | while IFS='|' read -r PANE_ID PANE_PID PANE_COMMAND; do
+                # Use process substitution to avoid subshell from pipeline
+                while IFS='|' read -r PANE_ID PANE_PID PANE_COMMAND; do
 
                 # Check if this command should be tracked
                 SHOULD_TRACK=false
@@ -269,7 +277,7 @@ for SERVER in "${SERVERS[@]}"; do
 
                     rm -f "$TEMP_NEW"
                 fi
-            done
+            done < <($TMUX_CMD list-panes -t "${SESSION}:${WINDOW}" -F "#{pane_id}|#{pane_pid}|#{pane_current_command}" 2>/dev/null)
         done
     done
     fi
@@ -284,7 +292,7 @@ for key in "${!STATE[@]}"; do
 done
 
 # Write new state file
-> "$STATE_FILE"
+true > "$STATE_FILE"
 for key in "${!NEW_STATE[@]}"; do
     IFS='|' read -r pane_id pid <<< "$key"
     IFS='|' read -r command start_ts <<< "${NEW_STATE[$key]}"

@@ -21,11 +21,12 @@ show_usage() {
 setup_niri_socket() {
   [[ -n "${NIRI_SOCKET:-}" && -S "$NIRI_SOCKET" ]] && return 0
 
-  local runtime_dir="/run/user/$(id -u)"
+  local runtime_dir
+  runtime_dir="/run/user/$(id -u)"
 
   # Try to get WAYLAND_DISPLAY if not set
   if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
-    WAYLAND_DISPLAY=$(ps -eo cmd,env | grep -E "^niri" | grep -oP 'WAYLAND_DISPLAY=\K[^ ]+' | head -1 || true)
+    WAYLAND_DISPLAY=$(pgrep -a niri | grep -oP 'WAYLAND_DISPLAY=\K[^ ]+' | head -1 || true)
   fi
 
   # Find socket matching WAYLAND_DISPLAY
