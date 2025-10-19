@@ -9,7 +9,7 @@ tmux new-session -d -s $session
 
 window=0
 tmux rename-window -t $session:$window 'todo'
-tmux send-keys -t $session:$window 'vim ~/notes/todo.md' C-m
+tmux send-keys -t $session:$window 'nvim ~/notes/todo.md' C-m
 
 window=1
 tmux new-window -t $session:$window -n 'journal'

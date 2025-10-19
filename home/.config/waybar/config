@@ -61,7 +61,7 @@
     },
 
     "pulseaudio": {
-        "format": "V{volume:>3}%",
+        "format": "V {volume:>3}%",
         "format-muted": "V MUTE",
         "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
     },

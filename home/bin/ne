@@ -7,12 +7,26 @@ import sys
 
 
 def append_date_and_start_vim(filename, prepend_newlines=False):
+    # Read the file if it exists, otherwise start with empty content
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            content = f.read()
+        # Remove all trailing whitespace and newlines
+        content = content.rstrip()
+    else:
+        content = ""
+
     prepend_str = "\n\n" if prepend_newlines else ""
 
     date_and_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
-    os.system(f'echo  "{prepend_str}## {date_and_time_str}\n\n" >> {filename}')
-    os.system(f'vim +$ +startinsert {filename}')
+    # Write the cleaned content + two newlines + date + two newlines
+    with open(filename, 'w') as f:
+        if content:
+            f.write(content)
+        f.write(f"{prepend_str}## {date_and_time_str}\n\n")
+
+    os.system(f'nvim +$ +startinsert {filename}')
 
 note_name_input = 'scratchpad'
 if(len(sys.argv) > 1):
@@ -20,9 +34,6 @@ if(len(sys.argv) > 1):
 
 if note_name_input.endswith(".md"): # it's a filename
     # TODO: Check if it's a valid file
-
-    # TODO: Be smarter about appending to end of file.
-    # Find the last non-whitespace line, delete everything after, add two newlines, add date.
 
     filename = note_name_input
     append_date_and_start_vim(note_name_input, prepend_newlines=True)

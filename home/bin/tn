@@ -9,7 +9,7 @@ if [ $? != 0 ]; then
   window=1
   tmux rename-window -t $session:$window 'todo'
   # C-m makes it execute immediately, rather than typing it out and waiting for the user to hit enter
-  tmux send-keys -t $session:$window 'vim ~/notes/todo.md' C-m
+  tmux send-keys -t $session:$window 'nvim ~/notes/todo.md' C-m
 
   window=2
   tmux new-window -t $session:$window -n 'journal'

@@ -18,5 +18,5 @@ user_selection = input("Which file? (or 'q' to quit): ")
 if(user_selection == "q" or user_selection == ""):
     exit()
 
-os.system(f'vim {file_paths[len(file_paths)-int(user_selection)]}')
+os.system(f'nvim {file_paths[len(file_paths)-int(user_selection)]}')
 
