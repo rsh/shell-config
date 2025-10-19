@@ -1,44 +1,109 @@
 #!/bin/bash
+set -euo pipefail
 
+# ts - tmux session starter
+# Creates a new niri workspace and opens a tmux session
+#
 # Usage: ts <session_name> [base_directory]
-# Creates a new niri workspace, opens a tmux session with the given name
-# If base_directory is provided, uses that as the working directory
-# Otherwise, if session_name matches a directory in ~/dev, uses that as the base directory
-# Otherwise defaults to ~
+#   session_name: Name of the tmux session to create/attach
+#   base_directory: Optional working directory (defaults to ~/dev/<session_name> or ~)
 
-if [ -z "$1" ]; then
+# ============================================================================
+# Functions
+# ============================================================================
+
+show_usage() {
   echo "Usage: ts <session_name> [base_directory]"
   exit 1
-fi
+}
 
-session_name="$1"
-base_dir="$HOME"
+# Ensure niri socket is accessible (important when running from tmux)
+setup_niri_socket() {
+  [[ -n "${NIRI_SOCKET:-}" && -S "$NIRI_SOCKET" ]] && return 0
 
-# If a base directory was provided, use it
-if [ -n "$2" ]; then
-  base_dir="$2"
-else
-  # Otherwise check if a directory with this name exists in ~/dev
-  dev_dir="$HOME/dev/$session_name"
-  if [ -d "$dev_dir" ]; then
-    base_dir="$dev_dir"
+  local runtime_dir="/run/user/$(id -u)"
+
+  # Try to get WAYLAND_DISPLAY if not set
+  if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
+    WAYLAND_DISPLAY=$(ps -eo cmd,env | grep -E "^niri" | grep -oP 'WAYLAND_DISPLAY=\K[^ ]+' | head -1 || true)
   fi
-fi
 
-# Get the highest workspace number to ensure we move to the last one first
-current_workspaces=$(niri msg workspaces | grep -oP '^\s*\*?\s*\K\d+' | sort -n)
-if [ -n "$current_workspaces" ]; then
-  last_workspace=$(echo "$current_workspaces" | tail -1)
-  # Focus the last workspace
-  niri msg action focus-workspace "$last_workspace"
-  sleep 0.1
-fi
+  # Find socket matching WAYLAND_DISPLAY
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+    NIRI_SOCKET=$(find "$runtime_dir" -name "niri.${WAYLAND_DISPLAY}.*.sock" 2>/dev/null | head -1 || true)
+  fi
 
-# Create a new workspace by moving down from the last one
-niri msg action focus-workspace-down
+  # Fallback: find any niri socket
+  if [[ -z "${NIRI_SOCKET:-}" || ! -S "$NIRI_SOCKET" ]]; then
+    NIRI_SOCKET=$(find "$runtime_dir" -name "niri.*.sock" 2>/dev/null | head -1 || true)
+  fi
 
-# Wait a moment for the workspace to be ready
-sleep 0.2
+  if [[ -z "${NIRI_SOCKET:-}" || ! -S "$NIRI_SOCKET" ]]; then
+    echo "Error: Could not find niri socket. Is niri running?" >&2
+    exit 1
+  fi
 
-# Open alacritty with tmux session in the base directory
-alacritty -e bash -c "cd \"$base_dir\" && exec tmux new-session -A -s \"$session_name\"" &
+  export NIRI_SOCKET WAYLAND_DISPLAY
+}
+
+# Resolve the working directory for the session
+resolve_base_directory() {
+  local session_name="$1"
+  local provided_dir="${2:-}"
+
+  if [[ -n "$provided_dir" ]]; then
+    echo "$provided_dir"
+    return
+  fi
+
+  local dev_dir="$HOME/dev/$session_name"
+  if [[ -d "$dev_dir" ]]; then
+    echo "$dev_dir"
+  else
+    echo "$HOME"
+  fi
+}
+
+# Create a new niri workspace and focus it
+create_new_workspace() {
+  # Get all workspace numbers and find the last one
+  local workspaces
+  workspaces=$(niri msg workspaces | grep -oP '^\s*\*?\s*\K\d+' | sort -n || true)
+
+  if [[ -n "$workspaces" ]]; then
+    local last_workspace
+    last_workspace=$(echo "$workspaces" | tail -1)
+    niri msg action focus-workspace "$last_workspace"
+    sleep 0.1
+  fi
+
+  # Create new workspace by moving down
+  niri msg action focus-workspace-down
+  sleep 0.2
+}
+
+# Launch alacritty with tmux in the specified directory
+launch_terminal() {
+  local session_name="$1"
+  local base_dir="$2"
+
+  alacritty -e bash -c "cd \"$base_dir\" && exec tmux new-session -A -s \"$session_name\"" &
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+
+main() {
+  [[ $# -eq 0 ]] && show_usage
+
+  local session_name="$1"
+  local base_dir
+  base_dir=$(resolve_base_directory "$session_name" "${2:-}")
+
+  setup_niri_socket
+  create_new_workspace
+  launch_terminal "$session_name" "$base_dir"
+}
+
+main "$@"
