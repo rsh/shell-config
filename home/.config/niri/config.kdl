@@ -279,7 +279,7 @@ layout {
 // swayosd provides on-screen display for volume, brightness, and other indicators
 spawn-at-startup "swayosd-server"
 
-spawn-at-startup "bash" "-c" "/home/rayhan/dev/shell-config/scripts/niri-startup-workspaces.sh"
+spawn-at-startup "bash" "-c" "~/.config/niri/niri-startup-workspaces.sh"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"

@@ -4,12 +4,20 @@
 # Reads list of applications from ~/.config/tmux-save-scrollback/commands_to_save.conf
 # Appends new lines with ISO8601 timestamps, detecting contiguity
 
+# Start timing the script execution
+SCRIPT_START_TIME=$(date +%s.%N)
+
 # Configuration file containing list of commands (one per line)
 CONFIG_FILE="$HOME/.config/tmux-save-scrollback/commands_to_save.conf"
 
 # Directory to store scrollback files
 SCROLLBACK_DIR="${TMUX_SCROLLBACK_DIR:-$HOME/.tmux-scrollback}"
 mkdir -p "$SCROLLBACK_DIR"
+
+# Log directory and file
+LOG_DIR="$SCROLLBACK_DIR/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/execution.log"
 
 # State and lock files
 STATE_FILE="$SCROLLBACK_DIR/.state"
@@ -21,8 +29,16 @@ mkdir -p "$TEMP_DIR"
 exec 200>"$LOCK_FILE"
 flock -n 200 || exit 0
 
-# Cleanup temp files on exit
-trap 'rm -rf "$TEMP_DIR"/*; flock -u 200' EXIT
+# Function to log execution time on exit
+log_execution_time() {
+    local end_time=$(date +%s.%N)
+    local duration=$(echo "$end_time - $SCRIPT_START_TIME" | bc)
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] Execution time: ${duration}s" >> "$LOG_FILE"
+}
+
+# Cleanup temp files on exit and log execution time
+trap 'rm -rf "$TEMP_DIR"/*; flock -u 200; log_execution_time' EXIT
 
 # If no config file exists, exit
 if [ ! -f "$CONFIG_FILE" ]; then
