@@ -62,10 +62,19 @@ declare -A ACTIVE_PANES
 strip_timestamps() {
     local file="$1"
     # Remove ISO8601 timestamp prefix: YYYY-MM-DDTHH:MM:SS: or [non-contiguous] YYYY-MM-DDTHH:MM:SS:
-    sed -E 's/^(\[non-contiguous\] )?[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}: //' "$file"
+    # Use awk for faster processing than sed
+    awk '{sub(/^(\[non-contiguous\] )?[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}: /, ""); print}' "$file"
 }
 
-# Function to find longest suffix of old content in new capture
+# Function to compute hash of last N lines of a file
+# Much faster than comparing line-by-line
+compute_tail_hash() {
+    local file="$1"
+    local num_lines="$2"
+    tail -n "$num_lines" "$file" 2>/dev/null | md5sum | cut -d' ' -f1
+}
+
+# Function to find longest suffix of old content in new capture using hashing
 # Returns line number in new capture where the match starts (0-indexed)
 # Returns -1 if no good match found
 find_suffix_match() {
@@ -76,26 +85,44 @@ find_suffix_match() {
     local old_lines=$(wc -l < "$old_file")
     local new_lines=$(wc -l < "$new_file")
 
-    # Try progressively smaller suffixes of old content
-    for ((suffix_len=$old_lines; suffix_len>=$min_match_lines; suffix_len--)); do
-        # Extract suffix from old content
-        local old_suffix_start=$((old_lines - suffix_len + 1))
+    # Early exit if files are too small
+    if [ "$old_lines" -lt "$min_match_lines" ] || [ "$new_lines" -lt "$min_match_lines" ]; then
+        echo "-1"
+        return 1
+    fi
 
-        # Get the suffix
-        local old_suffix=$(tail -n "$suffix_len" "$old_file")
+    # Try progressively smaller suffixes using hash comparison
+    # Start with reasonable chunk sizes to avoid too many iterations
+    local check_sizes=()
 
-        # Try to find this suffix in new content
-        # We check if the last suffix_len lines of any prefix of new content match
-        for ((new_end=$suffix_len; new_end<=$new_lines; new_end++)); do
-            local new_start=$((new_end - suffix_len + 1))
-            local new_segment=$(sed -n "${new_start},${new_end}p" "$new_file")
+    # Generate check points: full, 3/4, 1/2, 1/4, then every 100 lines down to min
+    check_sizes+=("$old_lines")
+    [ "$old_lines" -gt "$min_match_lines" ] && check_sizes+=($((old_lines * 3 / 4)))
+    [ "$old_lines" -gt "$min_match_lines" ] && check_sizes+=($((old_lines / 2)))
+    [ "$old_lines" -gt "$min_match_lines" ] && check_sizes+=($((old_lines / 4)))
 
-            if [ "$old_suffix" = "$new_segment" ]; then
+    for ((i=old_lines-100; i>=min_match_lines; i-=100)); do
+        check_sizes+=("$i")
+    done
+    check_sizes+=("$min_match_lines")
+
+    for suffix_len in "${check_sizes[@]}"; do
+        [ "$suffix_len" -lt "$min_match_lines" ] && continue
+        [ "$suffix_len" -gt "$old_lines" ] && continue
+
+        # Get hash of old suffix
+        local old_hash=$(compute_tail_hash "$old_file" "$suffix_len")
+
+        # Check if this suffix appears at the end of new content
+        if [ "$suffix_len" -le "$new_lines" ]; then
+            local new_hash=$(compute_tail_hash "$new_file" "$suffix_len")
+
+            if [ "$old_hash" = "$new_hash" ]; then
                 # Found a match! Return the line number where new content starts
-                echo "$new_end"
+                echo "$new_lines"
                 return 0
             fi
-        done
+        fi
     done
 
     # No match found
@@ -103,9 +130,13 @@ find_suffix_match() {
     return 1
 }
 
-# Get current timestamp in ISO8601 format
+# Get current timestamp in ISO8601 format (cached for the script run)
+CACHED_TIMESTAMP=""
 get_timestamp() {
-    date -Iseconds | cut -d'+' -f1 | cut -d'-' -f1-3 | tr -d '\n'
+    if [ -z "$CACHED_TIMESTAMP" ]; then
+        CACHED_TIMESTAMP=$(date -Iseconds | cut -d'+' -f1 | cut -d'-' -f1-3)
+    fi
+    echo -n "$CACHED_TIMESTAMP"
 }
 
 # Find all tmux server sockets
@@ -187,7 +218,7 @@ for SERVER in "${SERVERS[@]}"; do
                         # File exists - need to find what's new
                         TEMP_OLD_STRIPPED="$TEMP_DIR/old_stripped_$$_${PANE_ID//[^a-zA-Z0-9]/_}"
 
-                        # Strip timestamps from existing file
+                        # Strip timestamps from existing file (only once per pane)
                         strip_timestamps "$FILEPATH" > "$TEMP_OLD_STRIPPED"
 
                         # Find where old content matches in new capture
@@ -202,9 +233,8 @@ for SERVER in "${SERVERS[@]}"; do
 
                             if [ "$new_start" -le "$total_lines" ]; then
                                 # There are new lines to add
-                                tail -n +$new_start "$TEMP_NEW" | while IFS= read -r line; do
-                                    echo "${CURRENT_TS}: ${line}"
-                                done >> "$FILEPATH"
+                                # Use awk for faster processing instead of while read loop
+                                tail -n +"$new_start" "$TEMP_NEW" | awk -v ts="$CURRENT_TS" '{print ts ": " $0}' >> "$FILEPATH"
                             fi
                         else
                             # No match found - content is non-contiguous
@@ -216,10 +246,9 @@ for SERVER in "${SERVERS[@]}"; do
                         rm -f "$TEMP_OLD_STRIPPED"
                     else
                         # New file - add timestamps to all lines
+                        # Use awk for faster processing instead of while read loop
                         CURRENT_TS=$(get_timestamp)
-                        while IFS= read -r line; do
-                            echo "${CURRENT_TS}: ${line}"
-                        done < "$TEMP_NEW" > "$FILEPATH"
+                        awk -v ts="$CURRENT_TS" '{print ts ": " $0}' "$TEMP_NEW" > "$FILEPATH"
                     fi
 
                     rm -f "$TEMP_NEW"
