@@ -5,3 +5,6 @@ home/.config/qutebrowser/bookmarks/
 home/.config/qutebrowser/greasemonkey/
 home/.config/qutebrowser/quickmarks
 
+# Managed elsewhere
+home/.ssh/
+

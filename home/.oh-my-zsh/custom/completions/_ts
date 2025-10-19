@@ -1,0 +1,19 @@
+#compdef ts
+
+# Zsh completion for ts command
+_ts() {
+    local -a dev_dirs
+
+    if (( CURRENT == 2 )); then
+        # First argument: complete with directory names from ~/dev
+        if [[ -d ~/dev ]]; then
+            dev_dirs=(${(f)"$(find ~/dev -maxdepth 1 -type d -not -name 'dev' -exec basename {} \;)"})
+            _describe 'session name' dev_dirs
+        fi
+    elif (( CURRENT == 3 )); then
+        # Second argument: complete with directory paths
+        _directories
+    fi
+}
+
+_ts "$@"
