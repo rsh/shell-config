@@ -9,9 +9,40 @@ open_workspace() {
     local folder=$2
     local session=$3
 
+    # Focus the target workspace
     niri msg action focus-workspace "$workspace"
     sleep 0.3
+
+    # Get current total window count
+    local initial_total=$(niri msg -j windows | jq 'length')
+
+    # Launch the terminal
     alacritty -e bash -c "cd \"$folder\" && exec tmux new-session -A -s \"$session\"" &
+
+    # Wait for the window to actually appear (max 3 seconds)
+    local timeout=60
+    local count=0
+    while [ $count -lt $timeout ]; do
+        local current_total=$(niri msg -j windows | jq 'length')
+        if [ "$current_total" -gt "$initial_total" ]; then
+            # A new window appeared somewhere - check if it's on the right workspace
+            sleep 0.2
+            local window_workspace=$(niri msg -j windows | jq -r '.[-1].workspace_id')
+
+            if [ "$window_workspace" != "$workspace" ]; then
+                # Window appeared on wrong workspace - move it
+                niri msg action focus-window-down  # Focus the new window
+                niri msg action move-column-to-workspace "$workspace"
+                niri msg action focus-workspace "$workspace"
+                sleep 0.2
+            fi
+            return 0
+        fi
+        sleep 0.05
+        count=$((count + 1))
+    done
+
+    # Fallback: if we timed out, just wait a bit longer
     sleep 0.5
 }
 
