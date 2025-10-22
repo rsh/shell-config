@@ -380,6 +380,7 @@ binds {
     Mod+P hotkey-overlay-title="Open 1Password" { spawn "1password"; }
     Mod+M hotkey-overlay-title="Toggle Waybar" { spawn-sh "pkill -SIGUSR1 waybar"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+    Mod+Shift+S hotkey-overlay-title="Sleep" { spawn "systemctl" "suspend"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.

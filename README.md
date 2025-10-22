@@ -16,12 +16,6 @@ Run the installation script: `./install-ubuntu.sh`
 
 After installation completes: `./copy.sh`
 
-## Remap caps-lock to ctrl
-
-1. Open "Tweaks"
-1. "Keyboard" => "Additional Layout Options"
-1. "Caps Lock Behavior" => "Make Caps Lock an additional Ctrl"
-
 ## Per-application settings
 
 Done by hand, for now.
@@ -42,6 +36,17 @@ via: https://superuser.com/a/1323420 and https://bugzilla.mozilla.org/show_bug.c
 ### Set up fingerprint reader for auth
 
 Run `sudo pam-auth-update` and enable the fingerprint reader by hitting spacebar.
+
+## Vim/Neovim Keybindings
+
+Leader key: `<Space>`
+
+- `<Space>t` - Toggle NERDTree
+- `<Space>R` - Reload vimrc
+- `<Space>c` - Insert checkbox `- [ ] ` at beginning of line
+- `<Space>d` - Toggle checkbox state `[ ]` ↔ `[x]` (markdown files only)
+- `<Space>x` - Remove checkbox entirely (neovim, markdown files only)
+- `jk` - Exit insert mode (alternative to Esc)
 
 
 # MacOS

@@ -16,6 +16,8 @@ sudo apt install -y \
     brightnessctl \
     shellcheck \
     waybar \
+    swaylock \
+    swayidle \
     fonts-font-awesome
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

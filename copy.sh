@@ -57,3 +57,18 @@ else
     echo "No changes in /etc, skipping sudo stow"
 fi
 
+# Enable systemd user services
+if [ "$DRY_RUN" = true ]; then
+    echo "Would enable and start systemd user services..."
+else
+    # Reload systemd user daemon to pick up new service files
+    systemctl --user daemon-reload
+
+    # Enable swayidle service if it exists
+    if [ -f "$HOME/.config/systemd/user/swayidle.service" ]; then
+        echo "Enabling swayidle.service..."
+        systemctl --user enable swayidle.service
+        systemctl --user restart swayidle.service
+    fi
+fi
+

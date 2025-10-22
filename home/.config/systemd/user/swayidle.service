@@ -1,0 +1,17 @@
+[Unit]
+Description=Idle manager for Wayland
+Documentation=man:swayidle(1)
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/swayidle -w \
+    timeout 300 'swaylock' \
+    timeout 300 'niri msg action power-off-monitors' \
+        resume 'niri msg action power-on-monitors' \
+    timeout 600 'systemctl suspend' \
+    before-sleep 'swaylock -f'
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

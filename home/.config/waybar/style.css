@@ -40,14 +40,10 @@ window#waybar {
     background-color: transparent;
 }
 
-#custom-sep1,
-#custom-sep2,
-#custom-sep3,
-#custom-sep4,
-#custom-sep5,
-#custom-sep6 {
+#custom-sep {
     padding: 0 5px;
     color: #4a4a4a;
+    opacity: 0.7;
 }
 
 #battery.charging {
