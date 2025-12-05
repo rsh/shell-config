@@ -10,7 +10,7 @@
 
     "clock": {
         "interval": 1,
-        "format": "{:%m/%d %H:%M:%S}",
+        "format": "{:%a %m/%d %H:%M:%S}",
         "tooltip-format": "<tt><small>{calendar}</small></tt>",
         "calendar": {
             "mode": "year",
@@ -54,7 +54,7 @@
     },
 
     "network": {
-        "format-wifi": "W {essid} {signalStrength:>3}%",
+        "format-wifi": "W {essid:.12} {signalStrength:>3}%",
         "format-ethernet": "E {ifname}",
         "format-disconnected": "X DISCONNECTED",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr}"

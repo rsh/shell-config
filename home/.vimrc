@@ -25,7 +25,6 @@ set conceallevel=2
 let mapleader = " "
 map <leader>t :NERDTreeToggle<CR>
 nnoremap <leader>R :source $MYVIMRC<CR>
-nnoremap <leader>c <ESC>0i- [ ] 
 
 " show when leader key has been pressed
 set showcmd

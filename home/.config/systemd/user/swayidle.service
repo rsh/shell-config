@@ -7,10 +7,9 @@ PartOf=graphical-session.target
 Type=simple
 ExecStart=/usr/bin/swayidle -w \
     timeout 300 'swaylock' \
-    timeout 300 'niri msg action power-off-monitors' \
+    timeout 330 'niri msg action power-off-monitors' \
         resume 'niri msg action power-on-monitors' \
-    timeout 600 'systemctl suspend' \
-    before-sleep 'swaylock -f'
+    timeout 600 'systemctl suspend'
 Restart=on-failure
 
 [Install]

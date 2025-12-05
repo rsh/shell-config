@@ -1,78 +1,42 @@
-if !exists('g:checkbox_maps')
-  let g:checkbox_maps = 1
-endif
+" Simple markdown checkbox plugin
+" Author: Rayhan
+" Description: Clean and simple checkbox management for markdown files
 
-if !exists('g:values')
-  let g:values = [' ', 'x']
-endif
-
-if !exists('g:insert')
-  let g:insert = '\<'
-endif
-
-if !exists('g:prefix')
-  let g:prefix = ''
-endif
-
-if !exists('g:suffix')
-  let g:suffix = ' '
-endif
-
-function! s:ChangeCheckbox() abort
+" Create a new checkbox
+function! CheckboxCreate() abort
   let line = getline('.')
 
-  if(match(line, '\[.\]') != -1)
-    let states = copy(g:values)
-    call add(states, g:values[0])
-    for state in states
-      if(match(line, '\[' . state . '\]') != -1)
-        let next_state = states[index(states, state) + 1]
-        let line = substitute(
-              \ line,
-              \ '\[' . state . '\]',
-              \ '[' . next_state . ']',
-              \ '')
-        break
-      endif
-    endfor
-  else
-    if g:insert !=# ''
-      let line = substitute(
-            \ line,
-            \ g:insert,
-            \ g:prefix . '[' . g:values[0] . ']' . g:suffix,
-            \ '')
-    endif
+  " Only add checkbox if it doesn't already exist
+  if match(line, '- \[.\]') == -1
+    " Add "- [ ] " at the beginning of the line
+    call setline('.', '- [ ] ' . line)
   endif
 
-  call setline('.', line)
-endf
-
-function! s:DeleteCheckbox() abort
-  let line = getline('.')
-
-  if(match(line, '\[.\]') != -1)
-    let states = copy(g:values)
-    call add(states, g:values[0])
-    for state in states
-      let line = substitute(
-            \ line,
-            \ g:prefix . '\['. state . '\]' . g:suffix,
-            \ '',
-            \ '')
-    endfor
-  endif
-
-  call setline('.', line)
+  " Go to end of line and enter insert mode
+  normal! $a
 endfunction
 
-if g:checkbox_maps == 1
-  augroup markdown
-    autocmd FileType markdown
-          \ nnoremap <silent> <leader>d :call <SID>ChangeCheckbox()<CR>
-    autocmd FileType markdown
-          \ nnoremap <silent> <leader>x :call <SID>DeleteCheckbox()<CR>
-  augroup end
-endif
+" Mark checkbox as done
+function! CheckboxMarkDone() abort
+  let line = getline('.')
 
-" vim:set ft=vim sts=2 et:
+  " Replace [ ] or any checkbox state with [x]
+  if match(line, '\[.\]') != -1
+    let line = substitute(line, '\[\s*.\s*\]', '[x]', '')
+    call setline('.', line)
+  endif
+endfunction
+
+" Setup function to create mappings
+function! s:SetupCheckboxMappings() abort
+  nnoremap <buffer> <silent> <leader>c :call CheckboxCreate()<CR>
+  nnoremap <buffer> <silent> <leader>x :call CheckboxMarkDone()<CR>
+endfunction
+
+" Set up keybindings for markdown files
+augroup markdown_checkbox
+  autocmd!
+  autocmd FileType markdown call s:SetupCheckboxMappings()
+augroup end
+
+" vim:set ft=vim et sw=2 ts=2:
