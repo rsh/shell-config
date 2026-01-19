@@ -1,0 +1,12 @@
+// GPD Pocket 3 specific output configuration
+// DSI-1 is the internal rotated display
+
+output "DSI-1" {
+    layout {
+      default-column-width { proportion 1.0; }
+    }
+
+    mode "1920x1080@120.030"
+    scale 2
+    transform "270"
+}

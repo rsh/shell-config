@@ -3,8 +3,8 @@ set -euo pipefail
 
 if [[ "${1:-}" == "--dry-run" ]]; then
     echo "=== DRY RUN MODE ==="
-    stow -n -d stow -t ~ editor tmux
+    stow -n -d stow -t ~ nvim tmux
 else
-    stow -d stow -t ~ editor tmux
-    echo "Stowed: editor, tmux"
+    stow -d stow -t ~ nvim tmux
+    echo "Stowed: nvim, tmux"
 fi

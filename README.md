@@ -19,22 +19,22 @@ Run the installation script: `./install-ubuntu.sh`
 Config is organized into stow packages. Apply individual modules:
 
 ```bash
-stow -d stow -t ~ shell      # zsh, bash, oh-my-zsh
-stow -d stow -t ~ tmux       # tmux config and scripts
-stow -d stow -t ~ niri       # niri, swaylock, waybar, swayidle
-stow -d stow -t ~ editor     # vim, neovim
-stow -d stow -t ~ terminal   # alacritty
-stow -d stow -t ~ browser    # qutebrowser
-stow -d stow -t ~ audio      # pipewire
-stow -d stow -t ~ email      # mutt
-stow -d stow -t ~ rsync      # rsync.net scripts
-stow -d stow -t ~ misc       # utilities (battery, ne, etc.)
+stow -d stow -t ~ shell       # zsh, bash, oh-my-zsh
+stow -d stow -t ~ tmux        # tmux config and scripts
+stow -d stow -t ~ niri        # niri, swaylock, waybar, swayidle
+stow -d stow -t ~ nvim        # vim, neovim
+stow -d stow -t ~ alacritty   # alacritty terminal
+stow -d stow -t ~ qutebrowser # qutebrowser
+stow -d stow -t ~ audio       # pipewire
+stow -d stow -t ~ rsync       # rsync.net scripts
+stow -d stow -t ~ misc        # utilities (battery, ne, etc.)
+stow -d stow -t ~ gpd         # GPD Pocket 3 specific (+ sudo stow for /etc)
 ```
 
-Or apply all at once:
+Or apply standard set:
 
 ```bash
-stow -d stow -t ~ shell tmux niri editor terminal browser audio email rsync misc
+./stow-standard.sh
 ```
 
 ## Per-application settings

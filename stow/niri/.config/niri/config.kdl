@@ -3,6 +3,9 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 
+// Device-specific output config (e.g., GPD Pocket 3)
+include optional=true "gpd.kdl"
+
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://yalter.github.io/niri/Configuration:-Input
@@ -79,17 +82,6 @@ input {
 // Remember to uncomment the node by removing "/-"!
 output "HDMI-A-1" {
     position x=0 y=0
-}
-
-output "DSI-1" {
-    layout {
-      default-column-width { proportion 1.0; }
-    }
-
-    mode "1920x1080@120.030"
-    scale 2
-    transform "270"
-    // Position is omitted so niri auto-places DSI-1 adjacent to HDMI-A-1
 }
 
 // Settings that influence how windows are positioned and sized.
