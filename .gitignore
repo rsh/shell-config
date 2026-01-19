@@ -1,5 +1,3 @@
-# Local configuration for tmux scrollback commands
-home/.config/tmux-save-scrollback/commands_to_save.conf
 home/.config/qutebrowser/autoconfig.yml
 home/.config/qutebrowser/bookmarks/
 home/.config/qutebrowser/greasemonkey/
