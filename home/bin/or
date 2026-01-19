@@ -4,6 +4,8 @@ import os
 import pathlib
 import sys
 
+print("replace with FZF?")
+
 cwd = os.getcwd()
 file_paths = [x for x in pathlib.Path(cwd).iterdir() if x.is_file()]
 
