@@ -22,15 +22,17 @@ skipped_scripts=0
 # Find all shell scripts (excluding .git directory)
 mapfile -t scripts < <(find . -type f \( -name "*.sh" -o -name "*.bash" \) -not -path "./.git/*" | sort)
 
-# Also check scripts in home/bin that don't have extensions
-if [ -d "home/bin" ]; then
-    while IFS= read -r file; do
-        # Check if file is executable and has a bash/sh shebang
-        if [ -x "$file" ] && head -1 "$file" 2>/dev/null | grep -qE '^#!/.*(bash|sh)'; then
-            scripts+=("$file")
-        fi
-    done < <(find home/bin -type f ! -name "*.py" ! -name "*.md" ! -name "*.txt" | sort)
-fi
+# Also check scripts in stow/*/bin that don't have extensions
+for bindir in stow/*/bin; do
+    if [ -d "$bindir" ]; then
+        while IFS= read -r file; do
+            # Check if file is executable and has a bash/sh shebang
+            if [ -x "$file" ] && head -1 "$file" 2>/dev/null | grep -qE '^#!/.*(bash|sh)'; then
+                scripts+=("$file")
+            fi
+        done < <(find "$bindir" -type f ! -name "*.py" ! -name "*.md" ! -name "*.txt" | sort)
+    fi
+done
 
 # Remove duplicates and sort
 mapfile -t scripts < <(printf '%s\n' "${scripts[@]}" | sort -u)
