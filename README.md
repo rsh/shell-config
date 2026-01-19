@@ -14,7 +14,28 @@ It assumes:
 
 Run the installation script: `./install-ubuntu.sh`
 
-After installation completes: `./copy.sh`
+## Apply config modules
+
+Config is organized into stow packages. Apply individual modules:
+
+```bash
+stow -d stow -t ~ shell      # zsh, bash, oh-my-zsh
+stow -d stow -t ~ tmux       # tmux config and scripts
+stow -d stow -t ~ niri       # niri, swaylock, waybar, swayidle
+stow -d stow -t ~ editor     # vim, neovim
+stow -d stow -t ~ terminal   # alacritty
+stow -d stow -t ~ browser    # qutebrowser
+stow -d stow -t ~ audio      # pipewire
+stow -d stow -t ~ email      # mutt
+stow -d stow -t ~ rsync      # rsync.net scripts
+stow -d stow -t ~ misc       # utilities (battery, ne, etc.)
+```
+
+Or apply all at once:
+
+```bash
+stow -d stow -t ~ shell tmux niri editor terminal browser audio email rsync misc
+```
 
 ## Per-application settings
 
